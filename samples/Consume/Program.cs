@@ -1,4 +1,4 @@
-using Diavasi.Data;
+using Diavasi.Client;
 
 var parsed = argsMap(args);
 var halt = uint.TryParse(Get(parsed, "--halt-after"), out var parsedHalt) ? parsedHalt : 0u;

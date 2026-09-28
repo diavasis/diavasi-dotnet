@@ -7,6 +7,6 @@
     <IsPackable>false</IsPackable>
   </PropertyGroup>
   <ItemGroup>
-    <ProjectReference Include="..\..\Diavasi.Data\Diavasi.Data.csproj" />
+    <ProjectReference Include="..\..\Diavasi.Client\Diavasi.Client.csproj" />
   </ItemGroup>
 </Project>

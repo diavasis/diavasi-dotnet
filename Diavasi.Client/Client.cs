@@ -5,7 +5,7 @@ using Diavasi.Data.V1;
 using Grpc.Core;
 using Grpc.Net.Client;
 
-namespace Diavasi.Data;
+namespace Diavasi.Client;
 
 public sealed class ProtocolException : Exception
 {

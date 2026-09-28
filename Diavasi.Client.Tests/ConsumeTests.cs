@@ -1,4 +1,4 @@
-using Diavasi.Data;
+using Diavasi.Client;
 using Xunit;
 
 public class ConsumeTests

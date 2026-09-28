@@ -1,20 +1,20 @@
 # C# client
 
 [![CI](https://github.com/diavasis/diavasi-dotnet/actions/workflows/ci.yml/badge.svg)](https://github.com/diavasis/diavasi-dotnet/actions/workflows/ci.yml)
-[![NuGet](https://img.shields.io/nuget/v/Diavasi.Data.svg)](https://www.nuget.org/packages/Diavasi.Data)
+[![NuGet](https://img.shields.io/nuget/v/Diavasi.Client.svg)](https://www.nuget.org/packages/Diavasi.Client)
 [![license](https://img.shields.io/github/license/diavasis/diavasi-dotnet)](https://github.com/diavasis/diavasi-dotnet/blob/main/LICENSE)
 
-`Diavasi.Data.DiavasiClient` is a thin client of `diavasi.data.v1`, built with `Grpc.Net.Client`. `ConsumeAsync` opens a TLS stream, sends the bearer token, Hello version 1, then JoinGroup, and acks each batch. The client stores no cursor and does not dedupe on `record_id`. A dropped stream is how unacked batches return. Reconnect with the same consumer id and the server replays them.
+`Diavasi.Client.DiavasiClient` is a thin client of `diavasi.data.v1`, built with `Grpc.Net.Client`. `ConsumeAsync` opens a TLS stream, sends the bearer token, Hello version 1, then JoinGroup, and acks each batch. The client stores no cursor and does not dedupe on `record_id`. A dropped stream is how unacked batches return. Reconnect with the same consumer id and the server replays them.
 
-`proto/data.proto` in this repository is the copy of `diavasi.data.v1` from [github.com/diavasis/diavasi](https://github.com/diavasis/diavasi) tag `v0.12.0`. NuGet package `Diavasi.Data` is version 0.1.0 and targets `net8.0`.
+`proto/data.proto` in this repository is the copy of `diavasi.data.v1` from [github.com/diavasis/diavasi](https://github.com/diavasis/diavasi) tag `v0.13.0`. NuGet package `Diavasi.Client` is version 0.1.0 and targets `net8.0`.
 
 ## Install
 
 ```bash
-dotnet add package Diavasi.Data --version 0.1.0
+dotnet add package Diavasi.Client --version 0.1.0
 ```
 
-The library project is `Diavasi.Data/Diavasi.Data.csproj`. The example executable is `samples/Consume`. On linux/arm64, pass `-p:Protobuf_ProtocFullPath` to a system `protoc`. The bundled Grpc.Tools `protoc` exits 139 there. Debian's `protobuf-compiler` is the one the Compose image uses.
+The library project is `Diavasi.Client/Diavasi.Client.csproj`. The example executable is `samples/Consume`. On linux/arm64, pass `-p:Protobuf_ProtocFullPath` to a system `protoc`. The bundled Grpc.Tools `protoc` exits 139 there. Debian's `protobuf-compiler` is the one the Compose image uses.
 
 ## Library
 
@@ -56,7 +56,7 @@ catch (CallException exc)
 Start the server from the repo root:
 
 ```bash
-cargo build -p diavasi-cli
+cargo build -p diavasi
 export PATH="$PWD/target/debug:$PATH"
 mkdir -p /tmp/diavasi-sdk
 diavasi serve --bind 127.0.0.1:7700 --data-bind 127.0.0.1:7710 \
@@ -66,6 +66,8 @@ diavasi serve --bind 127.0.0.1:7700 --data-bind 127.0.0.1:7710 \
 In a second terminal, from the repo root:
 
 ```bash
+curl -fsS -X POST -H "Authorization: Bearer sdk-demo" \
+  http://127.0.0.1:7700/v1/groups/demo/pause || true
 curl -fsS -X DELETE -H "Authorization: Bearer sdk-demo" \
   http://127.0.0.1:7700/v1/groups/demo || true
 curl -fsS -H "Authorization: Bearer sdk-demo" -H "content-type: application/json" \
@@ -79,6 +81,8 @@ dotnet run --project samples/Consume -- \
   --token sdk-demo --group demo --consumer csharp --total 8
 ```
 
+Pause, delete, create, and start the group before another run. Delete returns 409 while it is running, and start resumes the cursor. A finished synthetic group leaves the client waiting on heartbeats.
+
 Flags: `--addr`, `--ca`, `--token`, `--group`, `--consumer`, `--total`, `--max-in-flight` (default 1), `--halt-after`. The last occurrence of a flag wins. The program prints `record_ids` and `batch_ids`.
 
 ```bash
@@ -87,4 +91,4 @@ docker compose -f clients/docker-compose.yml --profile csharp up --abort-on-cont
 
 ## Test
 
-`dotnet test Diavasi.Data.Tests` returns without asserting until `DIAVASI_DATA_ADDR`, `DIAVASI_CA`, and `DIAVASI_API_TOKEN` are set. With those set, it consumes `DIAVASI_TOTAL` records (default 8) from `DIAVASI_GROUP`.
+`dotnet test Diavasi.Client.Tests` returns without asserting until `DIAVASI_DATA_ADDR`, `DIAVASI_CA`, and `DIAVASI_API_TOKEN` are set. With those set, it consumes `DIAVASI_TOTAL` records (default 8) from `DIAVASI_GROUP`.

@@ -3,8 +3,8 @@
     <TargetFramework>net8.0</TargetFramework>
     <ImplicitUsings>enable</ImplicitUsings>
     <Nullable>enable</Nullable>
-    <RootNamespace>Diavasi.Data</RootNamespace>
-    <PackageId>Diavasi.Data</PackageId>
+    <RootNamespace>Diavasi.Client</RootNamespace>
+    <PackageId>Diavasi.Client</PackageId>
     <Version>0.1.0</Version>
     <Authors>diavasis</Authors>
     <Description>Thin client for the Diavasi data plane</Description>
